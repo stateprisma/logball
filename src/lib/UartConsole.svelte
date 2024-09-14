@@ -9,9 +9,11 @@
 
 	import { onMount } from 'svelte';
 	import { UART_HEIGHT, UART_WIDTH } from './constants';
+	import { calculateRows } from './utils';
+	import { VERSION } from './constants';
 
 	let options: ITerminalOptions & ITerminalInitOnlyOptions = {
-		fontSize: 11,
+		fontSize: 15,
 		customGlyphs: false,
 		cols: UART_WIDTH,
 		rows: UART_HEIGHT
@@ -23,6 +25,7 @@
 	let statusIcon: string;
 	let statusText: string;
 	let uartAddress: string = 'ws://localhost:1234';
+	let container: HTMLDivElement;
 
 	async function onLoad(event: CustomEvent<{ terminal: Terminal }>) {
 		terminal = event.detail.terminal;
@@ -33,16 +36,22 @@
 
 		const webLinksAddon = new (await XtermAddon.WebLinksAddon()).WebLinksAddon();
 		terminal.loadAddon(webLinksAddon);
-		fitAddon.fit();
 
 		terminal.onData((data) => {
 			socket.send(data);
 		});
-		statusText = 'idle';
+
+		terminal.resize(terminal.cols, calculateRows(container));
+		fitAddon.fit();
+
+		statusText = 'Idle';
+		terminal.write(`> Logball v${VERSION}\r\n`);
+		terminal.write('=================\r\n')
 	}
 
 	async function setupWebSocket() {
 		try {
+			terminal.write(`Connecting to ${uartAddress}...\r\n`);
 			socket = new WebSocket(uartAddress);
 		} catch (e) {
 			statusText = `${e}`;
@@ -57,12 +66,12 @@
 			terminal.write(event.data);
 		};
 
-		socket.onerror = (_) => {
-			statusText = 'WebSocket error';
+		socket.onerror = (e) => {
+			statusText = `${e}`;
 		};
 
 		socket.onclose = () => {
-			statusText = 'idle';
+			statusText = 'Idle';
 		};
 	}
 
@@ -71,7 +80,6 @@
 	}
 
 	async function onData(event: CustomEvent<string>) {
-		// sendData(event.detail);
 		console.log(event.detail);
 	}
 
@@ -80,6 +88,11 @@
 	}
 
 	onMount(() => {
+		window.addEventListener('resize', () => {
+			terminal.resize(terminal.cols, calculateRows(container));
+			fitAddon.fit();
+		});
+
 		return () => {
 			terminal.dispose();
 			if (socket && socket.readyState === WebSocket.OPEN) {
@@ -89,23 +102,18 @@
 	});
 </script>
 
-<div id="uart-controls">
-	<form>
-		<input type="text" bind:value={uartAddress} />
-		<input type="button" value="Connect" on:click={setupWebSocket} />
-		<span class={statusIcon}></span>{statusText}
+<div bind:this={container} id="terminal-container">
+	<Xterm class="xterm" {options} on:load={onLoad} on:key={onKey} on:data={onData} />
+</div>
+<div class="container">
+	<form id="controls">
+		<input class="input-field" type="text" bind:value={uartAddress} />
+		<input class="button" type="button" value="Connect" on:click={setupWebSocket} />
+		<p class="status-text">Status: {statusText}</p>
 	</form>
-	<div id="terminal-container">
-		<Xterm {options} on:load={onLoad} on:key={onKey} on:data={onData} />
-	</div>
 </div>
 
 <style>
-	#uart-controls {
-		margin-top: 10%;
-		flex: auto;
-	}
-
 	#terminal-container {
 		position: relative;
 		right: 0;
@@ -113,10 +121,73 @@
 		bottom: 20px;
 		left: 20px;
 		width: calc(100% - 40px);
-		height: calc(100% - 40px);
+		height: calc(100% - 100px);
 		background-color: black;
 		padding: 10px;
 		box-sizing: border-box;
 		overflow: hidden;
+		border-radius: 12px;
+	}
+
+	#controls {
+		position: relative;
+		margin: 35px;
+	}
+
+	.container {
+		position: relative;
+		display: inline-flex;
+		background-color: rgba(26, 30, 38, 1);
+		z-index: 2;
+		border-radius: 12px;
+		padding: 4px;
+		height: 6%;
+		align-items: center;
+		top: 25px;
+		bottom: 20px;
+		right: 25px;
+		left: 20px;
+		min-height: 50px !important;
+		width: calc(100% - 48px);
+		box-shadow:
+			inset 4px 4px 8px 0 rgba(0, 0, 0, 0.9),
+			inset -4px -4px 8px 0 rgba(40, 40, 40, 0.9);
+	}
+
+	.button {
+		display: inline-block;
+		padding: 10px 24px;
+		background-color: #1688e6;
+		color: var(--color-text);
+		font-size: 16px;
+		font-weight: bold;
+		border: none;
+		border-radius: 8px;
+		cursor: pointer;
+		transition:
+			background-color 0.2s ease,
+			box-shadow 0.2s ease;
+	}
+
+	.button:hover {
+		background-color: #006bc3;
+	}
+
+	.input-field {
+		position: relative;
+		display: inline-block;
+		left: 0px;
+		padding: 8px;
+		margin-right: 10px;
+		color: var(--color-text);
+		background-color: var(--color-bg-1);
+		outline: none;
+		border: 2px solid whitesmoke;
+		border-radius: 8px;
+	}
+
+	.status-text {
+		display: inline-block;
+		margin-left: 20px;
 	}
 </style>

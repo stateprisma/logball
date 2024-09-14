@@ -8,7 +8,7 @@
 	} from '@battlefieldduck/xterm-svelte';
 
 	import { onMount } from 'svelte';
-	import { UART_ADDRESS, UART_HEIGHT, UART_WIDTH } from './constants';
+	import { UART_HEIGHT, UART_WIDTH } from './constants';
 
 	let options: ITerminalOptions & ITerminalInitOnlyOptions = {
 		fontSize: 11,
@@ -20,10 +20,12 @@
 	let socket: WebSocket;
 	let fitAddon: FitAddon;
 	let terminal: Terminal;
+	let statusIcon: string;
+	let statusText: string;
+	let uartAddress: string = 'ws://localhost:1234';
 
 	async function onLoad(event: CustomEvent<{ terminal: Terminal }>) {
 		terminal = event.detail.terminal;
-		console.log('load');
 
 		/* FitAddon Usage */
 		fitAddon = new (await XtermAddon.FitAddon()).FitAddon();
@@ -36,15 +38,19 @@
 		terminal.onData((data) => {
 			socket.send(data);
 		});
-
-		terminal.write('\rUART loaded');
+		statusText = 'idle';
 	}
 
-	function setupWebSocket(terminal: Terminal) {
-		socket = new WebSocket(UART_ADDRESS);
+	async function setupWebSocket() {
+		try {
+			socket = new WebSocket(uartAddress);
+		} catch (e) {
+			statusText = `${e}`;
+			return;
+		}
 
 		socket.onopen = () => {
-			terminal.write('Connected to UART...\r\n');
+			statusText = `Connected to UART at ${uartAddress}`;
 		};
 
 		socket.onmessage = (event) => {
@@ -52,30 +58,28 @@
 		};
 
 		socket.onerror = (_) => {
-			terminal.write('WebSocket error\r\n');
+			statusText = 'WebSocket error';
 		};
 
 		socket.onclose = () => {
-			terminal.write('Connection closed\r\n');
+			statusText = 'idle';
 		};
 	}
 
-	function onKey(event: CustomEvent<{ key: string; domEvent: KeyboardEvent }>) {
+	async function onKey(event: CustomEvent<{ key: string; domEvent: KeyboardEvent }>) {
 		sendData(new Blob([event.detail.key]));
 	}
 
-	function onData(event: CustomEvent<string>) {
+	async function onData(event: CustomEvent<string>) {
 		// sendData(event.detail);
 		console.log(event.detail);
 	}
 
-	function sendData(data: string | Blob) {
+	async function sendData(data: string | Blob) {
 		if (socket && socket.readyState === WebSocket.OPEN) socket.send(data);
 	}
 
 	onMount(() => {
-		setupWebSocket(terminal);
-
 		return () => {
 			terminal.dispose();
 			if (socket && socket.readyState === WebSocket.OPEN) {
@@ -85,11 +89,23 @@
 	});
 </script>
 
-<div id="terminal-container">
-	<Xterm {options} on:load={onLoad} on:key={onKey} on:data={onData} />
+<div id="uart-controls">
+	<form>
+		<input type="text" bind:value={uartAddress} />
+		<input type="button" value="Connect" on:click={setupWebSocket} />
+		<span class={statusIcon}></span>{statusText}
+	</form>
+	<div id="terminal-container">
+		<Xterm {options} on:load={onLoad} on:key={onKey} on:data={onData} />
+	</div>
 </div>
 
 <style>
+	#uart-controls {
+		margin-top: 10%;
+		flex: auto;
+	}
+
 	#terminal-container {
 		position: relative;
 		right: 0;

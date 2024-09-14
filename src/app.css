@@ -4,8 +4,8 @@
 	--font-body: Arial, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
 		Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 	--font-mono: 'Fira Mono', monospace;
-	--color-bg-0: #282c34;
-	--color-bg-1: #21252b;
+	--color-bg-0: #21252b;
+	--color-bg-1: #1a1d21;
 	--color-text: #d7dae0;
 	--column-width: 42rem;
 	--column-margin-top: 4rem;
@@ -17,7 +17,7 @@ body {
 	min-height: 95vh;
 	margin: 0;
 	background-attachment: fixed;
-	background-color: var(--color-bg-1);
+	background-color: var(--color-bg-0);
 	background-size: 100vw 95vh;
 }
 

@@ -1,17 +1,15 @@
 <script lang="ts">
-	import {
-		type ITerminalOptions,
-		type ITerminalInitOnlyOptions,
-		type Terminal,
-		type FitAddon,
-		XtermAddon,
-		Xterm
+	import { Xterm, XtermAddon } from '@battlefieldduck/xterm-svelte';
+	import type {
+		ITerminalOptions,
+		ITerminalInitOnlyOptions,
+		Terminal,
+		FitAddon
 	} from '@battlefieldduck/xterm-svelte';
 
 	import { onMount } from 'svelte';
 	import { UART_ADDRESS, UART_HEIGHT, UART_WIDTH } from './constants';
 
-	let terminal: Terminal;
 	let options: ITerminalOptions & ITerminalInitOnlyOptions = {
 		fontSize: 11,
 		customGlyphs: false,
@@ -21,10 +19,11 @@
 
 	let socket: WebSocket;
 	let fitAddon: FitAddon;
+	let terminal: Terminal;
 
 	async function onLoad(event: CustomEvent<{ terminal: Terminal }>) {
-		console.log('load');
 		terminal = event.detail.terminal;
+		console.log('load');
 
 		/* FitAddon Usage */
 		fitAddon = new (await XtermAddon.FitAddon()).FitAddon();
@@ -32,7 +31,6 @@
 
 		const webLinksAddon = new (await XtermAddon.WebLinksAddon()).WebLinksAddon();
 		terminal.loadAddon(webLinksAddon);
-		terminal.write('\rLoading...\r\n');
 		fitAddon.fit();
 
 		terminal.onData((data) => {
@@ -42,7 +40,7 @@
 		terminal.write('\rUART loaded');
 	}
 
-	function setupWebSocket() {
+	function setupWebSocket(terminal: Terminal) {
 		socket = new WebSocket(UART_ADDRESS);
 
 		socket.onopen = () => {
@@ -62,8 +60,21 @@
 		};
 	}
 
+	function onKey(event: CustomEvent<{ key: string; domEvent: KeyboardEvent }>) {
+		sendData(new Blob([event.detail.key]));
+	}
+
+	function onData(event: CustomEvent<string>) {
+		// sendData(event.detail);
+		console.log(event.detail);
+	}
+
+	function sendData(data: string | Blob) {
+		if (socket && socket.readyState === WebSocket.OPEN) socket.send(data);
+	}
+
 	onMount(() => {
-		setupWebSocket();
+		setupWebSocket(terminal);
 
 		return () => {
 			terminal.dispose();
@@ -75,7 +86,7 @@
 </script>
 
 <div id="terminal-container">
-	<Xterm {options} on:load={onLoad} />
+	<Xterm {options} on:load={onLoad} on:key={onKey} on:data={onData} />
 </div>
 
 <style>

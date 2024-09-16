@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Card, CardBody, Row, Col, Container, Input } from '@sveltestrap/sveltestrap';
 	import { VALID_CONFIG_VERSIONS } from './constants';
-	import { addFilters } from './stores/filters';
+	import { setConfig } from './stores/config';
 
 	let files: FileList;
 
@@ -28,7 +28,7 @@
 					return;
 				}
 
-				addFilters(json.filters);
+				setConfig(json);
 			});
 	}
 </script>

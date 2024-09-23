@@ -1,11 +1,11 @@
 <script lang="ts">
 	import LogOverview from '$lib/LogOverview.svelte';
+	import type { SveltestrapTheme } from '$lib/types/sveltestrap.type';
 	import UartConsole from '$lib/UartConsole.svelte';
 	import Header from './Header.svelte';
 	import { Styles, Row, Col, Container } from '@sveltestrap/sveltestrap';
 
-	// ts complains unecessarilly here
-	let theme: any = 'auto';
+	let theme: SveltestrapTheme = 'auto';
 </script>
 
 <Styles {theme} />

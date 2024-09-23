@@ -1,5 +1,6 @@
 <script lang="ts">
 	import LogOverview from '$lib/LogOverview.svelte';
+	import LogToolsContainer from '$lib/logtools/LogToolsContainer.svelte';
 	import type { SveltestrapTheme } from '$lib/types/sveltestrap.type';
 	import UartConsole from '$lib/UartConsole.svelte';
 	import Header from './Header.svelte';
@@ -14,6 +15,7 @@
 	<Row>
 		<Col>
 			<LogOverview />
+			<LogToolsContainer />
 		</Col>
 		<Col>
 			<UartConsole />

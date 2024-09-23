@@ -59,12 +59,10 @@
 			socket.send(data);
 		});
 
-		terminal.resize(terminal.cols, calculateRows(container));
 		fitAddon.fit();
 
 		statusText = 'Idle';
-		terminal.write(`> Logball v${VERSION}\r\n`);
-		terminal.write('=================\r\n');
+		terminal.write(`\r\n  > Logball v${VERSION}\r\n`);
 	}
 
 	async function setupWebSocket() {
@@ -107,7 +105,6 @@
 
 	onMount(() => {
 		window.addEventListener('resize', () => {
-			terminal.resize(terminal.cols, calculateRows(container));
 			fitAddon.fit();
 		});
 
@@ -141,7 +138,7 @@
 					<label for="uart-addr">Uart Address</label>
 					<Input bind:value={uartAddress} name="uart-addr" />
 				</Col>
-				<Col class='mt-4'>
+				<Col class="mt-4">
 					<Button type="button" on:click={setupWebSocket}>Connect</Button>
 				</Col>
 			</Row>

@@ -15,17 +15,13 @@
 		Col,
 		Container,
 		Form,
-		FormGroup,
 		Input,
 		Row,
 		Button,
-		Icon,
 		Card,
 		CardBody,
 		CardFooter,
 		CardHeader,
-		CardSubtitle,
-		CardText,
 		CardTitle
 	} from '@sveltestrap/sveltestrap';
 
@@ -33,7 +29,6 @@
 		fontSize: 15,
 		customGlyphs: false,
 		cols: UART_WIDTH,
-		rows: UART_HEIGHT
 	};
 
 	let socket: WebSocket;
@@ -59,6 +54,7 @@
 			socket.send(data);
 		});
 
+		terminal.resize(terminal.cols, calculateRows(container));
 		fitAddon.fit();
 
 		statusText = 'Idle';
@@ -105,6 +101,7 @@
 
 	onMount(() => {
 		window.addEventListener('resize', () => {
+			terminal.resize(terminal.cols, calculateRows(container));
 			fitAddon.fit();
 		});
 
@@ -117,6 +114,7 @@
 	});
 </script>
 
+<div class="resize-container" bind:this={container}></div>
 <Card>
 	<CardHeader>
 		<CardTitle>Live UART</CardTitle>
@@ -145,3 +143,9 @@
 		</Form>
 	</CardFooter>
 </Card>
+
+<style>
+	.resize-container {
+		font-size: 15;
+	}
+</style>

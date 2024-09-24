@@ -22,7 +22,11 @@ def parse(filename: str, line_num: int) -> Generator[Tuple[int, str, str], None,
                 break
             if line.strip() == '':
                 continue
-            command, arg = line.split(' ', 1)
+            try:
+                command, arg = line.split(' ', 1)
+            except ValueError:
+                print('[ ERR ] Syntax error: Empty argument')
+                quit(1)
             yield (
                 current_line_num,
                 command.upper(),
@@ -48,7 +52,7 @@ def execute(client_handle: Any, line_num: int, command: str, arg: str) -> int:
             time.sleep(float(arg))
         except ValueError:
             print(f'[ ERR ] Invalid input for SLP: "{arg}"')
-   
+
     # Jump to a specific label and loop
     # Syntax:
     #   REP label iters (This loops `iters` times)
@@ -81,4 +85,10 @@ def execute(client_handle: Any, line_num: int, command: str, arg: str) -> int:
     elif command == 'LBL':
         _LABELS[arg.upper()] = [line_num, 0]
 
+    # Wait for input
+    elif command == 'INP':
+        input(f'[ INP ] > {arg} <  (Press ENTER)')
+
+    else:
+        print(f'[ ERR ] Syntax error: No such command as "{command}"')
     return -1

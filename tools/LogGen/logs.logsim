@@ -1,6 +1,9 @@
 REM Log testing script
 LOG Hello World
 
+REM Wait until enter is pressed
+INP Continue?
+
 REM We define a label "Loop1"
 LBL Loop1
 

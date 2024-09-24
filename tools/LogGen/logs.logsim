@@ -1,0 +1,14 @@
+REM Log testing script
+LOG Hello World
+
+REM We define a label "Loop1"
+LBL Loop1
+
+REM We send out a log message through websocket
+LOG Log message!
+
+REM We sleep/wait a second
+SLP 1.0
+
+REM We jump to "Loop1" label to iterate 5 times
+REP Loop1 5

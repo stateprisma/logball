@@ -123,6 +123,9 @@
 				<Col class="mt-4">
 					<Button type="button" on:click={setupSocket}>Connect</Button>
 				</Col>
+				<Col class="mt-4">
+					<p>{statusText}</p>
+				</Col>
 			</Row>
 		</Form>
 	</CardFooter>

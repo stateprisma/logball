@@ -1,21 +1,19 @@
 export type ConfigFile = {
 	version: string;
 	prefilter: RegExp;
-	filters: {
-		level: LevelLogFilter[];
-		module: ModuleLogFilter[];
-	};
+	filters?: LogFilter[];
+	stylings?: Styling[];
 };
 
 export type LogFilter = {
+	category: string;
 	pattern: RegExp;
 };
 
-export type LevelLogFilter = {
-	name: string;
+export type Styling = {
+	category: string;
+	text: string | null;
+	bold: boolean;
+	italic: boolean;
 	color: string;
-} & LogFilter;
-
-export type ModuleLogFilter = {
-	module: string;
-} & LogFilter;
+};

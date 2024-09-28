@@ -11,9 +11,9 @@
 
 	function parseFile() {
 		const file = files[0];
-		if (file.type != 'json') {
+		if (file.type != 'application/json') {
 			/* Wrong filetype */
-            console.error('Invalid config file! (It should be ".json")');
+			console.error('Invalid config file! (It should be ".json")');
 			return;
 		}
 
@@ -29,6 +29,7 @@
 				}
 
 				setConfig(json);
+				console.log('Config updated');
 			});
 	}
 </script>

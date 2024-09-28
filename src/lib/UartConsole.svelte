@@ -8,7 +8,7 @@
 	} from '@battlefieldduck/xterm-svelte';
 
 	import { onMount } from 'svelte';
-	import { UART_HEIGHT, UART_WIDTH } from './constants';
+	import { UART_WIDTH } from './constants';
 	import { calculateRows } from './utils';
 	import { VERSION } from './constants';
 	import {
@@ -24,14 +24,14 @@
 		CardHeader,
 		CardTitle
 	} from '@sveltestrap/sveltestrap';
+	import { connect, subscribe, send, EventType } from './socket';
 
 	let options: ITerminalOptions & ITerminalInitOnlyOptions = {
 		fontSize: 15,
 		customGlyphs: false,
-		cols: UART_WIDTH,
+		cols: UART_WIDTH
 	};
 
-	let socket: WebSocket;
 	let fitAddon: FitAddon;
 	let terminal: Terminal;
 	let statusColor: string;
@@ -50,53 +50,40 @@
 		const webLinksAddon = new (await XtermAddon.WebLinksAddon()).WebLinksAddon();
 		terminal.loadAddon(webLinksAddon);
 
-		terminal.onData((data) => {
-			socket.send(data);
-		});
-
 		terminal.resize(terminal.cols, calculateRows(container));
 		fitAddon.fit();
 
 		statusText = 'Idle';
-		terminal.write(`\r\n  > Logball v${VERSION}\r\n`);
-	}
-
-	async function setupWebSocket() {
-		try {
-			terminal.write(`Connecting to ${uartAddress}...\r\n`);
-			socket = new WebSocket(uartAddress);
-		} catch (e) {
-			statusText = `${e}`;
-			return;
-		}
-
-		socket.onopen = () => {
-			statusText = `Connected to UART at ${uartAddress}`;
-		};
-
-		socket.onmessage = (event) => {
-			terminal.write(event.data);
-		};
-
-		socket.onerror = (e) => {
-			statusText = `${e}`;
-		};
-
-		socket.onclose = () => {
-			statusText = 'Idle';
-		};
+		terminal.write(`\r\n  > Logball v${VERSION}\r\n\r\n`);
 	}
 
 	async function onKey(event: CustomEvent<{ key: string; domEvent: KeyboardEvent }>) {
-		sendData(new Blob([event.detail.key]));
+		send(new Blob([event.detail.key]));
 	}
 
 	async function onData(event: CustomEvent<string>) {
 		console.log(event.detail);
 	}
 
-	async function sendData(data: string | Blob) {
-		if (socket && socket.readyState === WebSocket.OPEN) socket.send(data);
+	function setupSocket() {
+		terminal.write(`Connecting to ${uartAddress}...\r\n`);
+		let result = connect(uartAddress);
+		if (result.ok === false) {
+			statusText = result.error;
+		}
+
+		subscribe((_: Event) => {
+			statusText = `Connected to UART at ${uartAddress}`;
+		}, EventType.ON_OPEN);
+		subscribe((event: MessageEvent) => {
+			terminal.write(event.data);
+		}, EventType.ON_MESSAGE);
+		subscribe((event: Event) => {
+			statusText = `${event}`;
+		}, EventType.ON_ERROR);
+		subscribe((_: Event) => {
+			statusText = 'Idle';
+		}, EventType.ON_CLOSE);
 	}
 
 	onMount(() => {
@@ -107,9 +94,6 @@
 
 		return () => {
 			terminal.dispose();
-			if (socket && socket.readyState === WebSocket.OPEN) {
-				socket.close();
-			}
 		};
 	});
 </script>
@@ -137,7 +121,7 @@
 					<Input bind:value={uartAddress} name="uart-addr" />
 				</Col>
 				<Col class="mt-4">
-					<Button type="button" on:click={setupWebSocket}>Connect</Button>
+					<Button type="button" on:click={setupSocket}>Connect</Button>
 				</Col>
 			</Row>
 		</Form>

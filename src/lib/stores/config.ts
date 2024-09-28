@@ -1,4 +1,4 @@
-import type { ConfigFile } from '$lib/config.type';
+import type { ConfigFile } from '$lib/types/config.type';
 import { writable } from 'svelte/store';
 
 export const configStore = writable<ConfigFile>();

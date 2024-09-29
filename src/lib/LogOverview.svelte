@@ -30,9 +30,29 @@
 				}
 
 				/* Set default values */
-				json.prefilter = json.prefilter === undefined ? /.*/g : new RegExp(json.prefilter);
+				let fJson: ConfigFile = {
+					version: json.version,
+					prefilter:
+						json.prefilter === undefined
+							? /.*/g
+							: new RegExp(json.prefilter.pattern, json.prefilter.flags)
+				};
 
-				setConfig(json as ConfigFile);
+				if (json.splitters !== undefined) {
+					fJson.splitters = [];
+					json.splitters.forEach((splitter: any) => {
+						fJson.splitters?.push({
+							category: splitter.category,
+							pattern: RegExp(splitter.pattern, splitter.flags),
+							styles:
+								splitter.styles?.map((style: any) => {
+									return { ...style, pattern: new RegExp(style.pattern, style.flags) };
+								}) ?? []
+						});
+					});
+				}
+
+				setConfig(fJson as ConfigFile);
 				console.log('Config updated');
 			});
 	}

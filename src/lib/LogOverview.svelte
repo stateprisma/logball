@@ -2,6 +2,7 @@
 	import { Card, CardBody, Row, Col, Container, Input } from '@sveltestrap/sveltestrap';
 	import { VALID_CONFIG_VERSIONS } from './constants';
 	import { setConfig } from './stores/config';
+	import type { ConfigFile } from './types/config.type';
 
 	let files: FileList;
 
@@ -28,7 +29,10 @@
 					return;
 				}
 
-				setConfig(json);
+				/* Set default values */
+				json.prefilter = json.prefilter === undefined ? /.*/g : new RegExp(json.prefilter);
+
+				setConfig(json as ConfigFile);
 				console.log('Config updated');
 			});
 	}

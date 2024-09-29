@@ -53,7 +53,7 @@ function getStyle(text: string, style?: Style): string {
 		fText = `<b>${fText}</b>`;
 	}
 	if (style.italic === true) {
-		fText = `<i>${fText}</b>`;
+		fText = `<i>${fText}</i>`;
 	}
 	if (style.color !== undefined) {
 		fText = `<span style="color: ${style.color};">${fText}</span>`;

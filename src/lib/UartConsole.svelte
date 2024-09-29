@@ -38,6 +38,7 @@
 	let statusText: string;
 	let uartAddress: string = 'ws://localhost:1234';
 	let container: HTMLDivElement;
+	let has_subscribed = false;
 
 	async function onLoad(event: CustomEvent<{ terminal: Terminal }>) {
 		terminal = event.detail.terminal;
@@ -72,6 +73,8 @@
 			statusText = result.error;
 		}
 
+		if (has_subscribed) return;
+
 		subscribe((_: Event) => {
 			statusText = `Connected to UART at ${uartAddress}`;
 		}, EventType.ON_OPEN);
@@ -84,6 +87,7 @@
 		subscribe((_: Event) => {
 			statusText = 'Idle';
 		}, EventType.ON_CLOSE);
+		has_subscribed = true;
 	}
 
 	onMount(() => {

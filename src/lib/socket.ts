@@ -27,6 +27,7 @@ export function connect(address: string | URL): Result<null, string> {
 
 		socket.onclose = (event) => {
 			subscribed.get(EventType.ON_CLOSE)?.map((o) => o(event));
+			socket.close();
 		};
 	} catch (e) {
 		return { ok: false, error: e as string };

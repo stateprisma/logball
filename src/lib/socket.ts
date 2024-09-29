@@ -1,4 +1,9 @@
+import { get } from 'svelte/store';
 import type { Result } from './types/std.type';
+import { configStore } from './stores/config';
+import { logStore } from './stores/logs';
+import type { Log } from './types/log.type';
+import { strToLog } from './logtools/logutils';
 
 export enum EventType {
 	ON_OPEN,
@@ -18,6 +23,12 @@ export function connect(address: string | URL): Result<null, string> {
 		};
 
 		socket.onmessage = (event) => {
+			let incomingData = event.data.toString();
+			if (get(configStore).prefilter.test(incomingData)) {
+				logStore.update((logs: Log[]) => {
+					return [...logs, strToLog(incomingData)];
+				});
+			}
 			subscribed.get(EventType.ON_MESSAGE)?.map((o) => o(event));
 		};
 

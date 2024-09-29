@@ -3,6 +3,8 @@
 	import { VALID_CONFIG_VERSIONS } from './constants';
 	import { setConfig } from './stores/config';
 	import type { ConfigFile } from './types/config.type';
+	import { get } from 'svelte/store';
+	import { logStore } from './stores/logs';
 
 	let files: FileList;
 
@@ -63,7 +65,7 @@
 		<Container fluid class="grid">
 			<Row>
 				<Col>
-					<p>Total logs:</p>
+					<p>Total logs: {get(logStore).length}</p>
 				</Col>
 				<Col>
 					<Input bind:files type="file" name="file" />

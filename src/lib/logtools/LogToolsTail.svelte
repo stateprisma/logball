@@ -18,5 +18,6 @@
 		margin: 0px;
 		margin-bottom: -5px;
 		padding: 0px;
+		font-family: monospace;
 	}
 </style>

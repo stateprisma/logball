@@ -1,0 +1,22 @@
+{
+	"version": "alpha",
+	"prefilter": {
+		"pattern": ".*",
+		"flags": "g"
+	},
+	"splitters": [
+		{
+			"category": "timestamp",
+			"pattern": "\\[.*\\]",
+			"flags": "g",
+			"styles": [
+				{
+					"pattern": ".*",
+					"flags": "g",
+					"bold": true,
+					"color": "#D3D3D3"
+				}
+			]
+		}
+	]
+}

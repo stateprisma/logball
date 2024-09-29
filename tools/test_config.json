@@ -2,7 +2,7 @@
 	"version": "alpha",
 	"prefilter": {
 		"pattern": "^\\d{7} \\[ .{4}\\ ] \\[.{12}\\] .+",
-		"flags": "g"
+		"flags": ""
 	},
 	"splitters": [
 		{

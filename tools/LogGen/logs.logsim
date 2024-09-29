@@ -1,5 +1,5 @@
 REM Log testing script
-LOG Hello World
+LOG 0000010 [ info ] [test_module ] Hello World!
 
 REM Wait until enter is pressed
 INP Continue?
@@ -8,7 +8,7 @@ REM We define a label "Loop1"
 LBL Loop1
 
 REM We send out a log message through websocket
-LOG Log message!
+LOG 0000020 [ warn ] [another_... ] This is a log message!
 
 REM We sleep/wait a second
 SLP 1.0

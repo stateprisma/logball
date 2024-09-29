@@ -38,7 +38,9 @@ export function connect(address: string | URL): Result<null, string> {
 export function subscribe(callback: CallableFunction, event: EventType) {
 	if (subscribed.has(event)) {
 		subscribed.get(event)?.push(callback);
+		return;
 	}
+
 	subscribed.set(event, [callback]);
 }
 

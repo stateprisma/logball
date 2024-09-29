@@ -1,20 +1,73 @@
 {
 	"version": "alpha",
 	"prefilter": {
-		"pattern": ".*",
+		"pattern": "^\\d{7} \\[ .{4}\\ ] \\[.{12}\\] .+",
 		"flags": "g"
 	},
 	"splitters": [
 		{
 			"category": "timestamp",
-			"pattern": "\\[.*\\]",
+			"pattern": "^\\d{7}",
+			"flags": "g",
+			"styles": [
+				{
+					"pattern": ".*",
+					"flags": "",
+					"bold": true,
+					"color": "#D3D3D3"
+				}
+			]
+		},
+		{
+			"category": "level",
+			"pattern": "(?<=\\d{7} \\[ )(.{4})(?= \\])",
+			"flags": "g",
+			"styles": [
+				{
+					"pattern": "info",
+					"flags": "i",
+					"color": "#1E90FF"
+				},
+				{
+					"pattern": "warn",
+					"flags": "i",
+					"color": "#FFAE42"
+				},
+				{
+					"pattern": "fail",
+					"flags": "i",
+					"color": "#DC143C"
+				},
+				{
+					"pattern": "crit",
+					"flags": "i",
+					"bold": true,
+					"color": "#C71585"
+				}
+			]
+		},
+		{
+			"category": "module",
+			"pattern": "(?<=^\\d{7} \\[ (.{4}) \\] \\[)(.{12})(?=\\])",
 			"flags": "g",
 			"styles": [
 				{
 					"pattern": ".*",
 					"flags": "g",
-					"bold": true,
-					"color": "#D3D3D3"
+					"italic": true,
+					"color": "#708090"
+				}
+			]
+		},
+		{
+			"category": "message",
+			"pattern": "(?<=^\\d{7} \\[ (.{4}) \\] \\[(.{12})] ).+",
+			"flags": "g",
+			"styles": [
+				{
+					"pattern": ".*",
+					"flags": "",
+					"bold": true
 				}
 			]
 		}

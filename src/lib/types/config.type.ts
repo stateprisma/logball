@@ -1,19 +1,18 @@
 export type ConfigFile = {
 	version: string;
 	prefilter: RegExp;
-	filters?: LogFilter[];
-	stylings?: Styling[];
+	splitters?: LogSplitter[];
 };
 
-export type LogFilter = {
+export type LogSplitter = {
 	category: string;
 	pattern: RegExp;
+	styles: Style[];
 };
 
-export type Styling = {
-	category: string;
-	text: string | null;
-	bold: boolean;
-	italic: boolean;
-	color: string;
+export type Style = {
+	pattern: RegExp;
+	bold?: boolean;
+	italic?: boolean;
+	color?: string;
 };

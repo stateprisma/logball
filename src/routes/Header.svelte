@@ -9,7 +9,7 @@
 		NavLink
 	} from '@sveltestrap/sveltestrap';
 
-	let isOpen = false;
+	let isOpen = $state(false);
 
 	async function toggle() {
 		isOpen = isOpen ? false : true;

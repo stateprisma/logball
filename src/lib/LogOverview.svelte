@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy';
+
 	import { Card, CardBody, Row, Col, Container, Input } from '@sveltestrap/sveltestrap';
 	import { VALID_CONFIG_VERSIONS } from './constants';
 	import { setConfig } from './stores/config';
@@ -6,11 +8,8 @@
 	import { get } from 'svelte/store';
 	import { logStore } from './stores/logs';
 
-	let files: FileList;
+	let files: FileList = $state();
 
-	$: if (files) {
-		parseFile();
-	}
 
 	function parseFile() {
 		const file = files[0];
@@ -58,6 +57,11 @@
 				console.log('Config updated');
 			});
 	}
+	run(() => {
+		if (files) {
+			parseFile();
+		}
+	});
 </script>
 
 <Card>

@@ -35,9 +35,9 @@
 	let fitAddon: FitAddon;
 	let terminal: Terminal;
 	let statusColor: string;
-	let statusText: string;
-	let uartAddress: string = 'ws://localhost:1234';
-	let container: HTMLDivElement;
+	let statusText: string = $state();
+	let uartAddress: string = $state('ws://localhost:1234');
+	let container: HTMLDivElement = $state();
 	let has_subscribed = false;
 
 	async function onLoad(event: CustomEvent<{ terminal: Terminal }>) {
